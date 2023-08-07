@@ -724,14 +724,14 @@ int main(void)
 				printk(" = %"PRId32" mV\n", val_mv);
 			}
 
-			sprintf(str, "%d %d", val_mv,i);
+			sprintf(str, "%d", val_mv);
 
 			if (bt_nus_send(NULL, str, strlen(str))) {
 			LOG_WRN("Failed to send data over BLE connection");
 			}
 		}
 		//dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
-		k_sleep(K_MSEC(1));
+		k_sleep(K_MSEC(0.5));
 	}
 	return 0;
 }
