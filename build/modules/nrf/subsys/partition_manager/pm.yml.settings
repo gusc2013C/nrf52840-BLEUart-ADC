@@ -1,0 +1,6 @@
+settings_storage:
+  placement:
+    before: [tfm_storage, end]
+    align: {start: 0x1000}
+  inside: [nonsecure_storage]
+  size: 0x2000

@@ -1,0 +1,2 @@
+osource "d:/git-projects/nrf52840-bleuart-adc/boards/shields/*/Kconfig.shield"
+osource "C:/ncs/v2.4.1/nrf/boards/shields/*/Kconfig.shield"
