@@ -26,7 +26,7 @@ UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 UART_RX_CHAR_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 UART_TX_CHAR_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
-values = np.zeros(50)
+values = np.zeros(80)
 plt.ion()#打开交互模式
 
 #预加载虚拟数据
@@ -43,8 +43,6 @@ count = 0
 
 
 with open('data.csv', mode='w', newline='') as file:
-    writer = csv.writer(file)
-
 # TIP: you can get this function and more from the ``more-itertools`` package.
 
     async def uart_terminal():
@@ -56,7 +54,7 @@ with open('data.csv', mode='w', newline='') as file:
         def match_nus_uuid(device: BLEDevice, adv: AdvertisementData):
             # This assumes that the device includes the UART service UUID in the
             # advertising data. This test may need to be adjusted depending on the
-            # actual advertising data supplied by the device.
+            # actual advertising data supplied20 by the device.
             if UART_SERVICE_UUID.lower() in adv.service_uuids:
                 return True
 
@@ -65,29 +63,37 @@ with open('data.csv', mode='w', newline='') as file:
         device = await BleakScanner.find_device_by_filter(match_nus_uuid)
 
         if device is None:
-            print("no matching device found, you may need to edit match_nus_uuid().")
+            print("no matching device found, you may need to edit match                   valueInInt = float(int(str(data.decode('utf-8'))))_nus_uuid().")
             sys.exit(1)
 
         def handle_disconnect(_: BleakClient):
             print("Device was disconnected, goodbye.")
-            # cancelling all tasks effectively ends the program
+            # cancelling all tasks efpython 优化fectively ends the program
             for task in asyncio.all_tasks():
                 task.cancel()
 
         def handle_rx(_: BleakGATTCharacteristic, data: bytearray):
             global count
-            print("received:", data.decode())
-            writer.writerow(str(data.decode()))
+            #print("received:", data.decode())
             count = count + 1
 
-            if (count % 20 == 0):
+            valueInInt = float(int(str(data.decode('utf-8'))))
+
+            if (valueInInt > 10000):
+                return
+
+            if (count % 5 == 0):
                 try:
-                    valueInInt = float(int(str(data.decode('utf-8'))))
-                    print(valueInInt)
+                    #print(valueInInt)
                     values[:-1] = values[1:]; values[-1] = valueInInt
+                    file.write(str(valueInInt)+"\n")
                     drawnow(plotValues)
                 except ValueError:
                     print("Invalid! cannot cast")
+
+            if (count % 200 == 0):
+                file.flush()
+
 
         async with BleakClient(device, disconnected_callback=handle_disconnect) as client:
             await client.start_notify(UART_TX_CHAR_UUID, handle_rx)
