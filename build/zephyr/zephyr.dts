@@ -208,7 +208,7 @@
 			channel@7 {
 				reg = < 0x7 >;
 				zephyr,gain = "ADC_GAIN_1_5";
-				zephyr,reference = "ADC_REF_VDD_1_4";
+				zephyr,reference = "ADC_REF_INTERNAL";
 				zephyr,vref-mv = < 0x2ee >;
 				zephyr,acquisition-time = < 0x0 >;
 				zephyr,input-positive = < 0x2 >;
