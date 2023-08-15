@@ -1,8 +1,8 @@
-# Install script for directory: C:/ncs/v2.4.1/nrf/drivers
+# Install script for directory: /home/luna/ncs/v2.4.1/nrf/drivers
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files/Zephyr-Kernel")
+  set(CMAKE_INSTALL_PREFIX "/usr/local")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,26 +34,26 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/ncs/toolchains/31f4403e35/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-objdump.exe")
+  set(CMAKE_OBJDUMP "/home/luna/ncs/toolchains/1f9b40e71a/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-objdump")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("D:/Git-Projects/nrf52840-BLEUart-ADC/build/modules/nrf/drivers/mpsl/cmake_install.cmake")
+  include("/home/luna/桌面/code/nrf52840-BLEUart-ADC/build/modules/nrf/drivers/mpsl/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("D:/Git-Projects/nrf52840-BLEUart-ADC/build/modules/nrf/drivers/hw_cc310/cmake_install.cmake")
+  include("/home/luna/桌面/code/nrf52840-BLEUart-ADC/build/modules/nrf/drivers/hw_cc310/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("D:/Git-Projects/nrf52840-BLEUart-ADC/build/modules/nrf/drivers/entropy/cmake_install.cmake")
+  include("/home/luna/桌面/code/nrf52840-BLEUart-ADC/build/modules/nrf/drivers/entropy/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("D:/Git-Projects/nrf52840-BLEUart-ADC/build/modules/nrf/drivers/serial/cmake_install.cmake")
+  include("/home/luna/桌面/code/nrf52840-BLEUart-ADC/build/modules/nrf/drivers/serial/cmake_install.cmake")
 endif()
 

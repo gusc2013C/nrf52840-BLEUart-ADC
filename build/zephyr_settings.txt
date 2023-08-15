@@ -6,6 +6,6 @@
 # and/or the west manifest file.
 #
 # See the Modules guide for more information.
-"BOARD_ROOT":"C:/ncs/v2.4.1/nrf"
-"DTS_ROOT":"C:/ncs/v2.4.1/nrf"
-"MODULE_EXT_ROOT":"C:/ncs/v2.4.1/nrf"
+"BOARD_ROOT":"/home/luna/ncs/v2.4.1/nrf"
+"DTS_ROOT":"/home/luna/ncs/v2.4.1/nrf"
+"MODULE_EXT_ROOT":"/home/luna/ncs/v2.4.1/nrf"

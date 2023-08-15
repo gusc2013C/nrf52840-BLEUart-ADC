@@ -7,8 +7,6 @@
 	],
 	"settings": {
 		"nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.4.0}",
-		"nrf-connect.applications": [
-			"${workspaceFolder}"
-		]
+		"nrf-connect.applications": []
 	}
 }

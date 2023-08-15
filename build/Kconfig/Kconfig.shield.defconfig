@@ -1,2 +1,2 @@
-osource "d:/git-projects/nrf52840-bleuart-adc/boards/shields/*/Kconfig.defconfig"
-osource "C:/ncs/v2.4.1/nrf/boards/shields/*/Kconfig.defconfig"
+osource "/home/luna/桌面/code/nrf52840-BLEUart-ADC/boards/shields/*/Kconfig.defconfig"
+osource "/home/luna/ncs/v2.4.1/nrf/boards/shields/*/Kconfig.defconfig"

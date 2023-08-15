@@ -731,7 +731,6 @@ int main(void)
 			}
 		}
 		//dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
-		k_sleep(K_MSEC(0.5));
 	}
 	return 0;
 }
