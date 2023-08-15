@@ -14640,13 +14640,13 @@
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_gain, 10, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_gain, 11, __VA_ARGS__)
 #define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_gain_EXISTS 1
-#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference "ADC_REF_VDD_1_4"
-#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_STRING_UNQUOTED ADC_REF_VDD_1_4
-#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_STRING_TOKEN ADC_REF_VDD_1_4
-#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_STRING_UPPER_TOKEN ADC_REF_VDD_1_4
-#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_ENUM_IDX 3
-#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_ENUM_TOKEN ADC_REF_VDD_1_4
-#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_ENUM_UPPER_TOKEN ADC_REF_VDD_1_4
+#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference "ADC_REF_INTERNAL"
+#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_STRING_UNQUOTED ADC_REF_INTERNAL
+#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_STRING_TOKEN ADC_REF_INTERNAL
+#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_STRING_UPPER_TOKEN ADC_REF_INTERNAL
+#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_ENUM_IDX 4
+#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_ENUM_TOKEN ADC_REF_INTERNAL
+#define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_ENUM_UPPER_TOKEN ADC_REF_INTERNAL
 #define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_FOREACH_PROP_ELEM(fn) fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 0) \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 1) \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 2) \
@@ -14661,7 +14661,8 @@
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 11) \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 12) \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 13) \
-	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 14)
+	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 14) \
+	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 15)
 #define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_FOREACH_PROP_ELEM_SEP(fn, sep) fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 0) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 1) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 2) DT_DEBRACKET_INTERNAL sep \
@@ -14676,7 +14677,8 @@
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 11) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 12) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 13) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 14)
+	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 14) DT_DEBRACKET_INTERNAL sep \
+	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 15)
 #define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_FOREACH_PROP_ELEM_VARGS(fn, ...) fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 0, __VA_ARGS__) \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 1, __VA_ARGS__) \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 2, __VA_ARGS__) \
@@ -14691,7 +14693,8 @@
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 11, __VA_ARGS__) \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 12, __VA_ARGS__) \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 13, __VA_ARGS__) \
-	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 14, __VA_ARGS__)
+	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 14, __VA_ARGS__) \
+	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 15, __VA_ARGS__)
 #define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_FOREACH_PROP_ELEM_SEP_VARGS(fn, sep, ...) fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 0, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 1, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 2, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
@@ -14706,7 +14709,8 @@
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 11, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 12, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
 	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 13, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
-	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 14, __VA_ARGS__)
+	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 14, __VA_ARGS__) DT_DEBRACKET_INTERNAL sep \
+	fn(DT_N_S_soc_S_adc_40007000_S_channel_7, zephyr_reference, 15, __VA_ARGS__)
 #define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_reference_EXISTS 1
 #define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_vref_mv 750
 #define DT_N_S_soc_S_adc_40007000_S_channel_7_P_zephyr_vref_mv_EXISTS 1

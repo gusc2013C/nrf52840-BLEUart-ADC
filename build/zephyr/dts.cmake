@@ -290,7 +290,7 @@ set_target_properties(devicetree_target PROPERTIES "DT_REG|/soc/adc@40007000/cha
 set_target_properties(devicetree_target PROPERTIES "DT_NODE|/soc/adc@40007000/channel@7" TRUE)
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/adc@40007000/channel@7|reg" "7;")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/adc@40007000/channel@7|zephyr,gain" "ADC_GAIN_1_5")
-set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/adc@40007000/channel@7|zephyr,reference" "ADC_REF_VDD_1_4")
+set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/adc@40007000/channel@7|zephyr,reference" "ADC_REF_INTERNAL")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/adc@40007000/channel@7|zephyr,vref-mv" "750")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/adc@40007000/channel@7|zephyr,acquisition-time" "0")
 set_target_properties(devicetree_target PROPERTIES "DT_PROP|/soc/adc@40007000/channel@7|zephyr,input-positive" "2")

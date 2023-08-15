@@ -1194,7 +1194,7 @@ zephyr_udc0: &usbd {
  channel@7 {
   reg = <7>;
   zephyr,gain = "ADC_GAIN_1_5";
-  zephyr,reference = "ADC_REF_VDD_1_4";
+  zephyr,reference = "ADC_REF_INTERNAL";
   zephyr,vref-mv = <750>;
   zephyr,acquisition-time = <0>;
   zephyr,input-positive = <2>;
