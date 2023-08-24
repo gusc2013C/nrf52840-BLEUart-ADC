@@ -13,6 +13,8 @@ from itertools import count, takewhile
 from typing import Iterator
 import csv
 import numpy as np
+import time
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 from drawnow import *
@@ -26,7 +28,7 @@ UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 UART_RX_CHAR_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 UART_TX_CHAR_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
-values = np.zeros(80)
+values = np.zeros(1000)
 plt.ion()#打开交互模式
 
 #预加载虚拟数据
@@ -40,9 +42,13 @@ def plotValues():
     plt.plot(values, label='Data')
 
 count = 0
+startReceiveFlag = 0
+startTime = 0
+writeCount = 0
 
+filenm = str(datetime.now()) + ".csv"
 
-with open('data.csv', mode='w', newline='') as file:
+with open(filenm, mode='w', newline='') as file:
 # TIP: you can get this function and more from the ``more-itertools`` package.
 
     async def uart_terminal():
@@ -63,20 +69,59 @@ with open('data.csv', mode='w', newline='') as file:
         device = await BleakScanner.find_device_by_filter(match_nus_uuid)
 
         if device is None:
-            print("no matching device found, you may need to edit match                   valueInInt = float(int(str(data.decode('utf-8'))))_nus_uuid().")
+            print("no matching device found, you may need to edit match")
             sys.exit(1)
 
         def handle_disconnect(_: BleakClient):
             print("Device was disconnected, goodbye.")
-            # cancelling all tasks efpython 优化fectively ends the program
+            file.close()
+            # cancelling all tasks effectively ends the program
             for task in asyncio.all_tasks():
                 task.cancel()
+            exit()
 
         def handle_rx(_: BleakGATTCharacteristic, data: bytearray):
-            global count
-            #print("received:", data.decode())
+            global count,startReceiveFlag,startTime,writeCount
+            
+            if startReceiveFlag == 0:
+                startReceiveFlag = 1
+                startTime = int(time.time()*10000)
+
+            #print("received:", data.hex())
+            #print(len(data))
             count = count + 1
 
+            recstr = data.hex()
+            strlen = len(data)
+
+            aver = 0
+
+            for i in range(0,int(strlen/2)):
+                inttmp1 = int(recstr[i*4:i*4+2],16)
+                inttmp2 = int(recstr[i*4+2:i*4+4],16)
+                ans = inttmp2 * 256 + inttmp1 - 3000
+                file.write(str((int(time.time()*10000) - startTime) * 0.0001 )+","+str(ans)+"\n")
+                writeCount += 1
+                aver += ans
+
+            aver /= int(strlen/2)
+            values[:-1] = values[1:]; values[-1] = aver
+                
+            if (count % 30 == 0):
+                try:
+                    #print(valueInInt)
+                    drawnow(plotValues)
+                    #valueInInt = 0  
+                except ValueError:
+                    print("Invalid! cannot cast")
+
+            if (count % 1000 == 0):
+                file.flush()
+
+            if (count % 300 == 0):
+                print(writeCount / ((int(time.time()*10000) - startTime) * 0.0001))
+                
+        '''
             valueInInt = float(int(str(data.decode('utf-8'))))
 
             if (valueInInt > 10000):
@@ -92,7 +137,7 @@ with open('data.csv', mode='w', newline='') as file:
                     print("Invalid! cannot cast")
 
             if (count % 200 == 0):
-                file.flush()
+                file.flush()'''
 
 
         async with BleakClient(device, disconnected_callback=handle_disconnect) as client:

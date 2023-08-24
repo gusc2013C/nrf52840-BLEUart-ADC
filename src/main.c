@@ -51,7 +51,7 @@
 LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
 #define STACKSIZE CONFIG_BT_NUS_THREAD_STACK_SIZE
-#define PRIORITY 7
+#define PRIORITY 3
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN	(sizeof(DEVICE_NAME) - 1)
@@ -82,8 +82,16 @@ struct uart_data_t {
 	uint16_t len;
 };
 
+struct fifo_data
+{
+	void *fifo_reserved;
+	char str[50];
+	uint16_t len;
+};
+
 static K_FIFO_DEFINE(fifo_uart_tx_data);
 static K_FIFO_DEFINE(fifo_uart_rx_data);
+static K_FIFO_DEFINE(fifo_bt_data);
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
@@ -105,6 +113,8 @@ static const struct adc_dt_spec adc_channels[] = {
 	DT_FOREACH_PROP_ELEM(DT_PATH(zephyr_user), io_channels,
 			     DT_SPEC_AND_COMMA)
 };
+
+uint32_t count = 0;
 
 static void uart_cb(const struct device *dev, struct uart_event *evt, void *user_data)
 {
@@ -294,14 +304,13 @@ static int uart_init(void)
 
 	if (IS_ENABLED(CONFIG_UART_LINE_CTRL)) {
 		LOG_INF("Wait for DTR");
-		while (true) {
+		/*while (true) {
 			uint32_t dtr = 0;
 
 			uart_line_ctrl_get(uart, UART_LINE_CTRL_DTR, &dtr);
 			if (dtr) {
 				break;
 			}
-			/* Give CPU resources to low priority threads. */
 			k_sleep(K_MSEC(100));
 		}
 		LOG_INF("DTR set");
@@ -312,7 +321,7 @@ static int uart_init(void)
 		err = uart_line_ctrl_set(uart, UART_LINE_CTRL_DSR, 1);
 		if (err) {
 			LOG_WRN("Failed to set DSR, ret code %d", err);
-		}
+		}*/
 	}
 
 	tx = k_malloc(sizeof(*tx));
@@ -590,35 +599,47 @@ static void configure_gpio(void)
 	}
 }
 
+struct adc_sequence sequence;
+uint16_t buf;
+char strSend[50];
+bool flagSend = false; 
+
 void ble_write_thread(void)
 {
-	/* Don't go any further until BLE is initialized */
-	k_sem_take(&ble_init_ok, K_FOREVER);
-
-	for (;;) {
-		/* Wait indefinitely for data to be sent over bluetooth */
-		struct uart_data_t *buf = k_fifo_get(&fifo_uart_rx_data,
+	while (1)
+	{
+		//printk("Entered\n");
+		struct fifo_data *buf = k_fifo_get(&fifo_bt_data,
 						     K_FOREVER);
-
-		if (bt_nus_send(NULL, buf->data, buf->len)) {
-			LOG_WRN("Failed to send data over BLE connection");
+		if (bt_nus_send(NULL, buf -> str, buf -> len)) ;
+		/*
+		for (int i = 0;i < buf->len;i++)
+		{
+			printk("%d ",(buf -> str)[i]);
 		}
+		printk("\n");
+		*/
 
-		k_free(buf);
+		//k_free(buf);
 	}
 }
 
 K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, NULL, NULL,
 		NULL, PRIORITY, 0, 0);
 
+K_THREAD_STACK_DEFINE(my_stack_area, STACKSIZE);
+struct k_thread my_thread_data;
+
+struct fifo_data tx_data;
+
+
 int main(void)
 {
-	int blink_status = 0;
 	int err = 0;
 	uint32_t count = 0;
-	uint16_t buf;
-	char str[100];
-
+	char str[50];
+	int groupcnt = 0;
+	int blink_status = 0;
 
 	configure_gpio();
 
@@ -667,13 +688,13 @@ int main(void)
 		return 0;
 	}
 
-	struct adc_sequence sequence = {
-		.buffer = &buf,
+	sequence.buffer = &buf;
 		/* buffer size in bytes, not number of samples */
-		.buffer_size = sizeof(buf),
-	};
+	sequence.buffer_size = sizeof(buf);
 
-	/* Configure channels individually prior to sampling. */
+	//printk("HERE\n");
+
+	/* Don't go any further until BLE is initialized */
 	for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++) {
 		if (!device_is_ready(adc_channels[i].dev)) {
 			printk("ADC controller device %s not ready\n", adc_channels[i].dev->name);
@@ -687,14 +708,47 @@ int main(void)
 		}
 	}
 
+	//k_tid_t my_tid = k_thread_create(&my_thread_data, my_stack_area, K_THREAD_STACK_SIZEOF(STACKSIZE), ble_write_thread, NULL, NULL,
+	//	NULL, PRIORITY, 0, K_NO_WAIT);
+	
+	//printk("FINISHED\n");
+
+	/*while (1)
+	{
+		printk("I am awake\n");
+		k_sleep(K_MSEC(1000));
+	}*/
+
+	/* Configure channels individually prior to sampling. */
+
+	for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++) {
+		if (!device_is_ready(adc_channels[i].dev)) {
+			printk("ADC controller device %s not ready\n", adc_channels[i].dev->name);
+			return 0;
+		}
+
+		err = adc_channel_setup_dt(&adc_channels[i]);
+		if (err < 0) {
+			printk("Could not setup channel #%d (%d)\n", i, err);
+			return 0;
+		}
+	}
+
+	groupcnt = 10;
+
+	int64_t time_stamp;
+	int64_t milliseconds_spent;
+	int16_t cntnum = 0;
+
+	/* capture initial time stamp */
+
 	while (1) {
-		printk("ADC reading[%u]:\n", count++);
+		//printk("ADC reading[%u]:\n", count++);
+		count++;
+		cntnum++;
+
 		for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++) {
 			int32_t val_mv;
-
-			printk("- %s, channel %d: ",
-			       adc_channels[i].dev->name,
-			       adc_channels[i].channel_id);
 
 			(void)adc_sequence_init_dt(&adc_channels[i], &sequence);
 
@@ -704,33 +758,58 @@ int main(void)
 				continue;
 			}
 
-			/*
-			 * If using differential mode, the 16 bit value
-			 * in the ADC sample buffer should be a signed 2's
-			 * complement value.
-			 */
 			if (adc_channels[i].channel_cfg.differential) {
 				val_mv = (int32_t)((int16_t)buf);
 			} else {
 				val_mv = (int32_t)buf;
-			}
-			printk("%"PRId32, val_mv);
+			}  
+			//printk("%"PRId32, val_mv);
 			err = adc_raw_to_millivolts_dt(&adc_channels[i],
 						       &val_mv);
-			/* conversion to mV may not be supported, skip if not */
+
 			if (err < 0) {
 				printk(" (value in mV not available)\n");
 			} else {
-				printk(" = %"PRId32" mV\n", val_mv);
+				//printk(" = %"PRId32" mV\n", val_mv);
 			}
 
-			sprintf(str, "%d", val_mv);
+			val_mv += 3000;
 
-			if (bt_nus_send(NULL, str, strlen(str))) {
-			LOG_WRN("Failed to send data over BLE connection");
+			if (cntnum == groupcnt)
+			{
+				str[((groupcnt-1) << 1)] = val_mv & 0xFF;
+				str[((groupcnt-1) << 1) | 1] = val_mv >> 8;
+				str[((groupcnt-1) << 1) + 2] = '\0';
+
+				tx_data.len = strlen(str);
+				strcpy(tx_data.str, str);
+
+				k_fifo_put(&fifo_bt_data, &tx_data);
+				memset(str ,0 , sizeof str);
+				flagSend = true;
+				cntnum = 0;
+			}
+			else
+			{
+				str[((cntnum-1) << 1)] = val_mv & 0xFF;
+				str[((cntnum-1) << 1) | 1] = val_mv >> 8;
+			}
+
+			if (count == 10000)
+			{
+				printk("START\n");
+				time_stamp = k_uptime_get();
+			}
+			else if (count == 20000)
+			{
+				printk("%lli\n", (k_uptime_get() - time_stamp));
 			}
 		}
+
 		//dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
+		k_usleep(3000);
+
 	}
+
 	return 0;
 }
