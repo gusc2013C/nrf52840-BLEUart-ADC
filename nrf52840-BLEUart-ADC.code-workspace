@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "nrf52840-BLEUart-ADC",
+			"path": "."
+		}
+	],
+	"settings": {
+		"nrf-connect.applications": [],
+		"files.associations": {
+			"kernel.h": "c"
+		}
+	}
+}

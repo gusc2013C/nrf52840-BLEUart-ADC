@@ -67,6 +67,7 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 #define UART_BUF_SIZE CONFIG_BT_NUS_UART_BUFFER_SIZE
 #define UART_WAIT_FOR_BUF_DELAY K_MSEC(50)
 #define UART_WAIT_FOR_RX CONFIG_BT_NUS_UART_RX_WAIT_TIME
+#define NUM_TO_SENT 40
 
 static K_SEM_DEFINE(ble_init_ok, 0, 1);
 
@@ -361,6 +362,30 @@ static int uart_init(void)
 	return err;
 }
 
+bool test_ready = false;
+
+static void exchange_func(struct bt_conn *conn, uint8_t att_err,
+			  struct bt_gatt_exchange_params *params)
+{
+	struct bt_conn_info info = {0};
+	int err;
+
+	printk("MTU exchange %s\n", att_err == 0 ? "successful" : "failed");
+	printk("MTU size is: %d\n", bt_gatt_get_mtu(conn));
+
+	err = bt_conn_get_info(conn, &info);
+	if (err) {
+		printk("Failed to get connection info %d\n", err);
+		return;
+	}
+
+	if (info.role == BT_CONN_ROLE_MASTER) {
+		test_ready = true;
+	}
+}
+
+struct bt_gatt_exchange_params exchange_params;
+
 static void connected(struct bt_conn *conn, uint8_t err)
 {
 	char addr[BT_ADDR_LE_STR_LEN];
@@ -375,7 +400,34 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 	current_conn = bt_conn_ref(conn);
 
+	exchange_params.func = exchange_func;
+
+	printk("MTU size is: %d\n", bt_gatt_get_mtu(current_conn));
+
+	err = bt_gatt_exchange_mtu(current_conn, &exchange_params);
+	if (err) {
+		printk("MTU exchange failed (err %d)\n", err);
+	} else {
+		printk("MTU exchange pending\n");
+	}
+
 	dk_set_led_on(CON_STATUS_LED);
+
+	struct bt_conn_le_data_len_param data_len_param;
+
+	data_len_param.tx_max_len = 200; // byte
+	data_len_param.tx_max_time = 3750; // us
+
+	err = bt_conn_le_data_len_update(current_conn, &data_len_param);
+	if (err)
+	{
+		printk("LE data length update failed: %d\n", err);
+	}
+        else
+	{
+		printk("LE data length update success \n");
+	}
+
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
@@ -601,17 +653,40 @@ static void configure_gpio(void)
 
 struct adc_sequence sequence;
 uint16_t buf;
-char strSend[50];
 bool flagSend = false; 
+
+const int MTU_SIZE = 244;
 
 void ble_write_thread(void)
 {
+	int count = 0;
+	char Bufstr[300];
 	while (1)
 	{
 		//printk("Entered\n");
 		struct fifo_data *buf = k_fifo_get(&fifo_bt_data,
 						     K_FOREVER);
-		if (bt_nus_send(NULL, buf -> str, buf -> len)) ;
+		if (buf -> len != 0)
+		{
+			count++;
+			Bufstr[(count-1) * 6] = buf->str[0];
+			Bufstr[((count-1) * 6) + 1] = buf->str[1];
+			Bufstr[((count-1) * 6) + 2] = buf->str[2];
+			Bufstr[((count-1) * 6) + 3] = buf->str[3];
+			Bufstr[((count-1) * 6) + 4] = buf->str[4];
+			Bufstr[((count-1) * 6) + 5] = buf->str[5];
+
+			if (count == NUM_TO_SENT)
+			{
+				bt_nus_send(NULL, Bufstr, count * 6);
+				//printk("%d\n",strlen(Bufstr));
+
+				count = 0;
+
+				memset(Bufstr, 0, sizeof Bufstr);
+			}
+		}
+		//printk("%u\n", bt_nus_get_mtu(current_conn));
 		/*
 		for (int i = 0;i < buf->len;i++)
 		{
@@ -632,13 +707,12 @@ struct k_thread my_thread_data;
 
 struct fifo_data tx_data;
 
-
 int main(void)
 {
 	int err = 0;
 	uint32_t count = 0;
-	char str[50];
 	int groupcnt = 0;
+	char BufferStr[10];
 	int blink_status = 0;
 
 	configure_gpio();
@@ -734,13 +808,15 @@ int main(void)
 		}
 	}
 
-	groupcnt = 10;
+	groupcnt = 20;
 
 	int64_t time_stamp;
 	int64_t milliseconds_spent;
 	int16_t cntnum = 0;
 
 	/* capture initial time stamp */
+	
+	time_stamp = k_uptime_get();
 
 	while (1) {
 		//printk("ADC reading[%u]:\n", count++);
@@ -775,30 +851,26 @@ int main(void)
 
 			val_mv += 3000;
 
-			if (cntnum == groupcnt)
-			{
-				str[((groupcnt-1) << 1)] = val_mv & 0xFF;
-				str[((groupcnt-1) << 1) | 1] = val_mv >> 8;
-				str[((groupcnt-1) << 1) + 2] = '\0';
+			int64_t tmptime = k_uptime_get() - time_stamp;
 
-				tx_data.len = strlen(str);
-				strcpy(tx_data.str, str);
+			BufferStr[0] = val_mv & 0xFF;
+			BufferStr[1] = val_mv >> 8;
+			BufferStr[2] = tmptime & 0xFF;
+			BufferStr[3] = (tmptime >> 8) & 0xFF;
+			BufferStr[4] = (tmptime >> 16) & 0xFF;
+			BufferStr[5] = (tmptime >> 24) & 0xFF;
 
-				k_fifo_put(&fifo_bt_data, &tx_data);
-				memset(str ,0 , sizeof str);
-				flagSend = true;
-				cntnum = 0;
-			}
-			else
-			{
-				str[((cntnum-1) << 1)] = val_mv & 0xFF;
-				str[((cntnum-1) << 1) | 1] = val_mv >> 8;
-			}
+			tx_data.len = strlen(BufferStr);
+			strcpy(tx_data.str, BufferStr);
+
+			k_fifo_put(&fifo_bt_data, &tx_data);
+			memset(BufferStr ,0 , sizeof BufferStr);
+
+			//printk("%lld %d\n", tmptime, val_mv);
 
 			if (count == 10000)
 			{
 				printk("START\n");
-				time_stamp = k_uptime_get();
 			}
 			else if (count == 20000)
 			{
@@ -807,7 +879,7 @@ int main(void)
 		}
 
 		//dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
-		k_usleep(3000);
+		k_msleep(2);
 
 	}
 
