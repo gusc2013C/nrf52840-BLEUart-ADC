@@ -117,6 +117,11 @@ static const struct adc_dt_spec adc_channels[] = {
 
 uint32_t count = 0;
 
+static K_SEM_DEFINE(saadc_sem, 0, 1);
+static void saadc_timer_handler() { k_sem_give(&saadc_sem); }
+static K_TIMER_DEFINE(saadc_timer, saadc_timer_handler, NULL);
+
+
 static void uart_cb(const struct device *dev, struct uart_event *evt, void *user_data)
 {
 	ARG_UNUSED(dev);
@@ -808,6 +813,9 @@ int main(void)
 		}
 	}
 
+	int timer_interval_us = 2300;
+    k_timer_start(&saadc_timer, K_NO_WAIT, K_USEC(timer_interval_us)); // 20ms一次 每秒钟50次？ 这么低吗
+
 	groupcnt = 20;
 
 	int64_t time_stamp;
@@ -820,6 +828,7 @@ int main(void)
 
 	while (1) {
 		//printk("ADC reading[%u]:\n", count++);
+		k_sem_take(&saadc_sem, K_FOREVER);
 		count++;
 		cntnum++;
 
@@ -879,7 +888,7 @@ int main(void)
 		}
 
 		//dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
-		k_msleep(2);
+		//k_msleep(2);
 
 	}
 

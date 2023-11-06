@@ -45,6 +45,7 @@ count = 0
 startReceiveFlag = 0
 startTime = 0
 writeCount = 0
+datacnt = 0
 
 filenm = str(datetime.now()) + ".csv"
 
@@ -81,11 +82,8 @@ with open(filenm, mode='w', newline='') as file:
             exit()
 
         def handle_rx(_: BleakGATTCharacteristic, data: bytearray):
-            global count,startReceiveFlag,startTime,writeCount
+            global count,startReceiveFlag,startTime,writeCount,datacnt
             
-            if startReceiveFlag == 0:
-                startReceiveFlag = 1
-                startTime = int(time.time()*10000)
 
             #print("received:", data.hex())
             #print(len(data))
@@ -95,19 +93,35 @@ with open(filenm, mode='w', newline='') as file:
             strlen = len(data)
 
             aver = 0
+            avernum = 10
+            timecnt = 0
 
-            for i in range(0,int(strlen/2)):
-                inttmp1 = int(recstr[i*4:i*4+2],16)
-                inttmp2 = int(recstr[i*4+2:i*4+4],16)
-                ans = inttmp2 * 256 + inttmp1 - 3000
-                file.write(str((int(time.time()*10000) - startTime) * 0.0001 )+","+str(ans)+"\n")
-                writeCount += 1
-                aver += ans
-
-            aver /= int(strlen/2)
-            values[:-1] = values[1:]; values[-1] = aver
+            for i in range(0,int(strlen/6)):
+                inttmp1 = int(recstr[i*12:i*12+2],16)
+                inttmp2 = int(recstr[i*12+2:i*12+4],16)
+                inttmp3 = int(recstr[i*12+4:i*12+6],16)
+                inttmp4 = int(recstr[i*12+6:i*12+8],16)
+                inttmp5 = int(recstr[i*12+8:i*12+10],16)
+                inttmp6 = int(recstr[i*12+10:i*12+12],16)
                 
-            if (count % 30 == 0):
+                ans = inttmp2 * 256 + inttmp1 - 3000
+                timecnt = inttmp3 + inttmp4 * 256 + inttmp5 * 65536 + inttmp6 * 16777216
+                
+                if startReceiveFlag == 0:
+                    startReceiveFlag = 1
+                    startTime = timecnt
+                
+                file.write(str(timecnt * 0.001) +","+str(ans)+"\n")
+                writeCount += 1
+                datacnt += 1
+                aver += ans
+                if (writeCount % avernum == 0):
+                    aver /= avernum
+                    values[:-1] = values[1:]; values[-1] = aver
+                    aver = 0
+
+                
+            if (count % 10 == 0):
                 try:
                     #print(valueInInt)
                     drawnow(plotValues)
@@ -115,11 +129,13 @@ with open(filenm, mode='w', newline='') as file:
                 except ValueError:
                     print("Invalid! cannot cast")
 
-            if (count % 1000 == 0):
+            if (count % 200 == 0):
                 file.flush()
-
-            if (count % 300 == 0):
-                print(writeCount / ((int(time.time()*10000) - startTime) * 0.0001))
+                
+            if (count % 100 == 0):
+            	print(datacnt / ((timecnt - startTime) * 0.001))
+            	startTime = timecnt
+            	datacnt = 0
                 
         '''
             valueInInt = float(int(str(data.decode('utf-8'))))
